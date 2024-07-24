@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-# %%
 import transformer_utils_subset as tus 
 # this is the subset of transformer_utils module from the Nano-Transformer directory, including only the 
 # functions needed for the diffusion transformer
@@ -17,7 +14,7 @@ from IPython.display import Image, display, HTML
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-# %%
+
 # ***Embedders for timesteps and context***
 
 class TimestepEmbedder(nn.Module):
@@ -36,6 +33,7 @@ class TimestepEmbedder(nn.Module):
         t = t.unsqueeze(-1)  #[num_timesteps,1]
         embeddings = self.mlp(t) #[num_timesteps, d]
         return embeddings  
+
 
 class LabelEmbedder(nn.Module): 
     """
@@ -75,7 +73,7 @@ class LabelEmbedder(nn.Module):
         return embeddings
 
 
-# %%
+
 # ***DiT model with adaptive layer norm***
 
 def modulate(x, shift, scale):
@@ -85,6 +83,7 @@ def modulate(x, shift, scale):
     #x: [B,num_patches,d]
     #scale, shift: [B,d] --> unsqueeze(1) --> [B,1,d]
     return x * (1 + scale.unsqueeze(1)) + shift.unsqueeze(1) #[B,num_patches,d]
+
 
 class TransformerBlockEncoder_DiT(nn.Module): 
     """Follows TransformerBlockEncoder from transformer_utils (under Nano-transformer repository), except
@@ -135,6 +134,7 @@ class TransformerBlockEncoder_DiT(nn.Module):
 
         return x
 
+
 class FinalLayer(nn.Module):
     """In addition to projecting the output to [B,num_patches,P*P*Cin] space,
     includes one last modulation of layernorm by the context and timesteps"""
@@ -155,6 +155,7 @@ class FinalLayer(nn.Module):
         x = modulate(x, shift, scale) #[B,num_patches,d]
         x = self.linear(x)  #[B,num_patches,P*P*Cin]
         return x
+
 
 class DiTc(nn.Module): 
     """Full diffusion transformer with context"""
@@ -228,7 +229,8 @@ class DiTc(nn.Module):
 
         return x
 
-# %%
+
+
 # ***Variance schedule***
 
 # diffusion hyperparameters
@@ -245,7 +247,8 @@ ab_t = torch.cumsum(a_t.log(), dim=0).exp()
 ab_t[0] = 1
 
 
-# %%
+
+
 # ***Training***
 
 def plot_loss(train_losses):
@@ -258,10 +261,12 @@ def plot_loss(train_losses):
     plt.xlabel("Epochs")
     plt.ylabel("Loss")
 
+
 def perturb_input(x0, t, noise):
     """Adds noise to an image according to variance schedule."""
     # ab_t dimension changed to match x's
     return ab_t[t, None, None, None].sqrt() * x0 + (1 - ab_t[t, None, None, None]).sqrt() * noise
+
 
 # Training parameters
 
@@ -278,6 +283,7 @@ model.train()
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
 criterion = nn.MSELoss()
+
 
 # Training loop
 
@@ -321,7 +327,8 @@ for epoch in trange(num_epochs):
 plot_loss(train_losses)
 #torch.save(trained_params, f"trained_model.pth")
 
-# %%
+
+
 # ***Sampling***
 
 # Load the model weights (to skip the training, which would take ~20 mins using a GeForce RTX 3080)
@@ -339,6 +346,7 @@ def denoise(x, t, pred_noise, extra_noise, s4):
     s2 = (1 - a_t[t]) / (1 - ab_t[t]).sqrt()
     s3 = b_t[t].sqrt() 
     return s1*(x-s2*pred_noise)+s3*s4*extra_noise
+
 
 @torch.no_grad()
 def generate_with_context(c, s4, Cin=1, H=28, W=28): 
@@ -362,6 +370,7 @@ def generate_with_context(c, s4, Cin=1, H=28, W=28):
 
     return x
 
+
 def show_genims(s4):
     """Shows the MNIST digits generated according to s4 parameter in a 5x10 matrix."""
     nrow, ncol = 5, 10
@@ -378,7 +387,7 @@ def show_genims(s4):
     plt.show()
 
 
-# %%
+
 # ***Display results***
 
 show_genims(s4 = 1) # generation with max extra noise
