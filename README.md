@@ -1,4 +1,4 @@
-Minimal DDPM/DiT-based generation of MNIST digits from scratch. Heavily commented, self-contained script with all non-essential complexities stripped. 
+Minimal DDPM/DiT-based generation of MNIST digits. Heavily commented, self-contained script with all non-essential complexities stripped. 
 
 Added an extra coefficient into denoising function to adjust the strength of extra noise term, enabling to tradeoff the variety of generated samples with their quality.
 
