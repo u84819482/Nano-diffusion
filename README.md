@@ -1,4 +1,4 @@
-Minimal [DDPM/DiT-based generation](https://nbviewer.org/github/akrvrdr/NanoDiffusion/blob/main/diffusion_transformer_image_generation.ipynb) of MNIST digits. Heavily commented, self-contained script with all non-essential complexities stripped. 
+Minimal [DDPM/DiT-based generation](https://nbviewer.org/github/u84819482/Nano-Diffusion/blob/main/diffusion_transformer_image_generation.ipynb) of MNIST digits. Heavily commented, self-contained script with all non-essential complexities stripped. 
 
 Added an extra coefficient into denoising function to adjust the strength of extra noise term, enabling to tradeoff the variety of generated samples with their quality.
 
